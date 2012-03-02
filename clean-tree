@@ -1,0 +1,10 @@
+#!/bin/bash
+set -o errexit
+
+# Clean the tree
+rm -rf synthesis/scratch
+rm -rf simulation/scratch
+
+echo "--> cleaned all dirs"
+
+exit 0

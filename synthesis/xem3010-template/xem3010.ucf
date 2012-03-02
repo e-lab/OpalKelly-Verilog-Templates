@@ -1,0 +1,182 @@
+#-------------------------------------------------------------------------
+# XEM3010 - Xilinx constraints file
+#
+# Pin mappings for the XEM3010.  Use this as a template and comment out 
+# the pins that are not used in your design.  (By default, map will fail
+# if this file contains constraints for signals not in your design).
+#
+# Copyright (c) 2004-2006 Opal Kelly Incorporated
+# $Rev: 152 $ $Date: 2006-10-08 11:14:04 -0700 (Sun, 08 Oct 2006) $
+#-------------------------------------------------------------------------
+#-------------------------------
+# FrontPanel Host Interface pins
+#-------------------------------
+NET "hi_in<0>"		LOC = "N10";
+NET "hi_in<1>"		LOC = "V2";
+NET "hi_in<2>"		LOC = "V3";
+NET "hi_in<3>"		LOC = "V12";
+NET "hi_in<4>"		LOC = "R8";
+NET "hi_in<5>"		LOC = "T8";
+NET "hi_in<6>"		LOC = "V8";
+NET "hi_in<7>"		LOC = "V7";
+NET "hi_out<0>"		LOC = "V10";
+NET "hi_out<1>"		LOC = "V11";
+NET "hi_inout<0>"	LOC = "T7";
+NET "hi_inout<1>"	LOC = "R7";
+NET "hi_inout<2>"	LOC = "V9";
+NET "hi_inout<3>"	LOC = "U9";
+NET "hi_inout<4>"	LOC = "P11";
+NET "hi_inout<5>"	LOC = "N11";
+NET "hi_inout<6>"	LOC = "R12";
+NET "hi_inout<7>"	LOC = "T12";
+NET "hi_inout<8>"	LOC = "U6";
+NET "hi_inout<9>"	LOC = "V5";
+NET "hi_inout<10>"	LOC = "U5";
+NET "hi_inout<11>"	LOC = "V4";
+NET "hi_inout<12>"	LOC = "U4";
+NET "hi_inout<13>"	LOC = "T4";
+NET "hi_inout<14>"	LOC = "T5";
+NET "hi_inout<15>"	LOC = "R5";
+
+NET "hi_muxsel"		LOC = "R9";
+NET "i2c_sda"		LOC = "R13" | PULLUP;
+NET "i2c_scl"		LOC = "U13" | PULLUP;
+
+#NET "jtag_tck"		LOC = "P14"
+#NET "jtag_tms"		LOC = "R14"
+#NET "jtag_tdi"		LOC = "R10"
+#NET "jtag_tdo"		LOC = "P12"
+
+#---------------
+# PLL Clock pins
+#---------------
+NET "clk1"		LOC = "N9";
+NET "sdram_clk" TNM_NET="TNM_clk1";
+TIMESPEC "TS_clk1" = PERIOD "TNM_clk1" 10 ns HIGH 50%;
+NET "clk2"		LOC = "P9";
+#NET "sdram_clk" TNM_NET="TNM_clk2";
+#TIMESPEC "TS_clk2" = PERIOD "TNM_clk2" 7.519 ns HIGH 50%;
+
+#------------
+# Peripherals
+#------------
+NET "sdram_cke"		LOC = "F8";
+NET "sdram_cas_n"	LOC = "E11";
+NET "sdram_ras_n"	LOC = "D12";
+NET "sdram_we_n"	LOC = "E7";
+NET "sdram_cs_n"	LOC = "E8";
+NET "sdram_ldqm"	LOC = "D9";
+NET "sdram_udqm"	LOC = "A9";
+NET "sdram_a<0>"	LOC = "A15";
+NET "sdram_a<1>"	LOC = "A16";
+NET "sdram_a<2>"	LOC = "B15";
+NET "sdram_a<3>"	LOC = "B14";
+NET "sdram_a<4>"	LOC = "D11";
+NET "sdram_a<5>"	LOC = "B13";
+NET "sdram_a<6>"	LOC = "C11";
+NET "sdram_a<7>"	LOC = "A12";
+NET "sdram_a<8>"	LOC = "A11";
+NET "sdram_a<9>"	LOC = "D10";
+NET "sdram_a<10>"	LOC = "A17";
+NET "sdram_a<11>"	LOC = "B10";
+NET "sdram_a<12>"	LOC = "A10";
+NET "sdram_ba<0>"	LOC = "C12";
+NET "sdram_ba<1>"	LOC = "A14";
+NET "sdram_d<0>"	LOC = "C4";
+NET "sdram_d<1>"	LOC = "D5";
+NET "sdram_d<2>"	LOC = "C5";
+NET "sdram_d<3>"	LOC = "D6";
+NET "sdram_d<4>"	LOC = "D7";
+NET "sdram_d<5>"	LOC = "C7";
+NET "sdram_d<6>"	LOC = "C8";
+NET "sdram_d<7>"	LOC = "D8";
+NET "sdram_d<8>"	LOC = "B9";
+NET "sdram_d<9>"	LOC = "A8";
+NET "sdram_d<10>"	LOC = "A7";
+NET "sdram_d<11>"	LOC = "B6";
+NET "sdram_d<12>"	LOC = "A5";
+NET "sdram_d<13>"	LOC = "B5";
+NET "sdram_d<14>"	LOC = "A4";
+NET "sdram_d<15>"	LOC = "B4";
+
+NET "led<0>"		LOC = "V14";
+NET "led<1>"		LOC = "U14";
+NET "led<2>"		LOC = "T14";
+NET "led<3>"		LOC = "V15";
+NET "led<4>"		LOC = "U15";
+NET "led<5>"		LOC = "V16";
+NET "led<6>"		LOC = "V17";
+NET "led<7>"		LOC = "U16";
+
+# JP2
+#NET "DAC10_D<9>"	LOC = "T16";
+#NET "DAC10_D<3>"	LOC = "U18";	
+#NET "DAC10_D<8>"	LOC = "T17";	
+#NET "DAC10_D<2>"	LOC = "T18";	
+#NET "DAC10_D<7>"	LOC = "R16";	
+#NET "DAC10_D<1>"	LOC = "R17";	
+#NET "DAC10_D<6>"	LOC = "P15";	
+#NET "DAC10_D<0>"	LOC = "R18";	
+#NET "DAC10_D<5>"	LOC = "P16";	
+#NET "DAC10_D<4>"	LOC = "N15";	
+#NET "Tdiff"		LOC = "M15";
+#NET "T_SW"		LOC = "M16";
+#NET "Srst"		LOC = "L15";
+#NET "S100f"		LOC = "L16";
+#NET "DAC10_CLK"	LOC = "L18";
+#NET "S200f"		LOC = "N14";
+#NET "S300f"		LOC = "M14";
+#NET "ADC_OTR"		LOC = "K18";
+#NET "ADC_D<15>"	LOC = "K13";
+#NET "ADC_D<14>"	LOC = "L13";
+#NET "ADC_D<13>"	LOC = "K15";
+#NET "ADC_D<12>"	LOC = "H13";
+#NET "ADC_D<11>"	LOC = "J15";
+#NET "ADC_D<10>"	LOC = "J18";
+#NET "ADC_D<9>"		LOC = "F14";
+#NET "DAC12_CS"		LOC = "H16";
+#NET "DAC12_CLK"	LOC = "H15";
+#NET "DAC12_LD"		LOC = "G16";
+#NET "DAC12_RS"		LOC = "G15";
+#NET "DAC12_SDI3"	LOC = "F15";
+#NET "DAC12_SDI2"	LOC = "E16";
+#NET "DAC12_SDI1"	LOC = "E15";
+
+# JP3
+#NET "ADV_DATA"		LOC = "U1";
+#NET "ENA_CNT"		LOC = "T3";
+#NET "RST_MEMn"		LOC = "T1";
+#NET "NV3CLK"		LOC = "T2";
+#NET "CLKcounter"	LOC = "R2";
+#NET "ENA_CNT_SYNC"	LOC = "R3";
+#NET "SET_MEM"		LOC = "P4";
+#NET "NV3D<9>"		LOC = "P2";
+#NET "ADV_COLTKN"	LOC = "P3";
+#NET "NV3D<8>"		LOC = "P1";
+#NET "RST_COLTKNn"	LOC = "N4";
+#NET "NV3D<7>"		LOC = "N2";
+#NET "NV3D<6>"		LOC = "M1";
+#NET "gRST"		LOC = "M3";
+#NET "NV3D<5>"		LOC = "L2";
+#NET "gTX"		LOC = "L4";
+#NET "NV3D<4>"		LOC = "L1";
+#NET "gRSEL"		LOC = "L3";
+#NET "NV3D<3>"		LOC = "K2";
+#NET "NV3D<2>"		LOC = "K1";
+#NET "QI_ROWTKN"	LOC = "M5";
+#NET "NV3D<1>"		LOC = "K5";
+#NET "ADV_ROWTKN"	LOC = "L5";
+#NET "NV3D<0>"		LOC = "K4";
+#NET "RST_ROWTKNn"	LOC = "L6";
+#NET "ADC_CLK"		LOC = "J4";
+#NET "ADC_D<0>"		LOC = "G5";
+#NET "ADC_D<1>"		LOC = "J2";
+#NET "ADC_D<2>"		LOC = "H3";
+#NET "ADC_D<3>"		LOC = "H2";
+#NET "ADC_D<4>"		LOC = "G3";
+#NET "ADC_D<5>"		LOC = "F2";
+#NET "ADC_D<6>"		LOC = "F4";
+#NET "ADC_D<7>"		LOC = "E2";
+#NET "ADC_D<8>"		LOC = "E4";
+#NET "button<0>"		LOC = "P7";
+#NET "button<1>"		LOC = "P6";

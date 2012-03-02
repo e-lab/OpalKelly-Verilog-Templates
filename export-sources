@@ -1,0 +1,110 @@
+#!/bin/bash
+set -o errexit
+
+# Exporting sources
+cd synthesis
+if [ -f $2 ]
+then
+    # create dirs
+    test -d scratch && rm -rf scratch
+    mkdir -p scratch
+
+    echo "--> Exporting projects to synthesis/scratch"
+    ls -d xem* | xargs -I DIR mkdir -p scratch/DIR/src/
+    ls -d xem*/* | xargs -I FILE ln -sf ../../FILE scratch/FILE
+
+    echo "--> Exporting project specific source code"
+    cd scratch
+    for FILE in `find . -type d -name "xem*" -print`
+    do
+        echo "----> Copying ${FILE} source code"
+        cp ../../cores/$FILE/modules/* $FILE/src/
+    done
+    cd ..
+
+    echo "--> Exporting non-project specific source code"
+    for FILE in `find ../cores -type d -maxdepth 1 -mindepth 1 ! -name "xem*" -print`
+    do
+        echo "----> Copying ${FILE} source code to all projects"
+        for DIR in `find ./scratch/* -type d -name "src" -print`
+        do
+            cp $FILE/modules/* $DIR/
+        done
+    done
+
+    # Export third party ip
+    for FILE in `find ./scratch/* -type d -name "*xem3001*" -print`
+    do
+        echo "--> Exporting Opal Kelly Spartan3 library and black boxes to ${FILE}"
+        cp ../ips/opalkelly/black-boxes-spartan3/* $FILE
+
+        for DIR in `find ../ips -type d  -name "xem3001*" -print`
+        do
+            echo "--> Exporting third party code: ${DIR}"
+	    cp -r ${DIR} $FILE
+        done
+    done
+
+    for FILE in `find ./scratch/* -type d -name "*xem3010*" -print`
+    do
+        echo "--> Exporting Opal Kelly Spartan3 library and black boxes to ${FILE}"
+        cp ../ips/opalkelly/black-boxes-spartan3/* $FILE
+
+        for DIR in `find ../ips -type d  -name "xem3010*" -print`
+        do
+            echo "--> Exporting third party code: ${DIR}"
+	    cp -r ${DIR} $FILE
+        done
+    done
+
+    for FILE in `find ./scratch/* -type d -name "*xem5010*" -print`
+    do
+        echo "--> Exporting Opal Kelly Virtex5 library and black boxes to ${FILE}"
+        cp ../ips/opalkelly/black-boxes-virtex5/* $FILE
+
+        for DIR in `find ../ips -type d  -name "xem5010*" -print`
+        do
+            echo "--> Exporting third party code: ${DIR}"
+	    cp -r ${DIR} $FILE
+        done
+    done
+
+    for FILE in `find ./scratch/* -type d -name "*xem6001*" -print`
+    do
+        echo "--> Exporting Opal Kelly xem6001 library and black boxes to ${FILE}"
+        cp ../ips/opalkelly/black-boxes-xem6001/* $FILE
+
+        for DIR in `find ../ips -type d  -name "xem6001*" -print`
+        do
+            echo "--> Exporting third party code: ${DIR}"
+	    cp -r ${DIR} $FILE
+        done
+    done
+
+    for FILE in `find ./scratch/* -type d -name "*xem6010*" -print`
+    do
+        echo "--> Exporting Opal Kelly xem6010 library and black boxes to ${FILE}"
+        cp ../ips/opalkelly/black-boxes-xem6010/* $FILE
+
+        for DIR in `find ../ips -type d  -name "xem6010*" -print`
+        do
+            echo "--> Exporting third party code: ${DIR}"
+	    cp -r ${DIR} $FILE
+        done
+    done
+
+
+    echo "Set XST param, to activate synthesis options"
+    for FILE in `find ./scratch/* -type f -name "common_functions.v" -print`
+    do
+        #echo "${FILE}"
+        echo "\`define __SYNTH_ONLY__" > temp
+        cat $FILE >> temp
+        mv temp $FILE 
+    done
+
+
+
+fi
+
+exit 0
