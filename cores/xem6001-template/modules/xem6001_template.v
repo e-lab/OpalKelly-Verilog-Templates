@@ -27,7 +27,7 @@ module xem6001_template
     output [7:0]    led,
 
     output          a_rx_valid,
-    output [7:0]    a_rx_data,
+    output [7:0]    a_rx_data
    );
 
 
