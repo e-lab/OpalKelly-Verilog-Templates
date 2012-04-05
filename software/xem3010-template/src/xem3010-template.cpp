@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <limits.h>
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 //#include <sys/types.h>
@@ -33,10 +33,10 @@ void sigint_handler (int sig_no)
 	processing_stopped = 1;
 }
 
-okCUsbFrontPanel* initialize_xem (const std::string filename)
+okCFrontPanel* initialize_xem (const std::string filename)
 {
 
-	okCUsbFrontPanel *xem; // Pointer to the Opal Kelly library object.
+	okCFrontPanel *xem; // Pointer to the Opal Kelly library object.
 
 
 	if (FALSE == okFrontPanelDLL_LoadLib (NULL)) {
@@ -44,20 +44,20 @@ okCUsbFrontPanel* initialize_xem (const std::string filename)
 		return NULL;
 	}
 
-	xem = new okCUsbFrontPanel;
+	xem = new okCFrontPanel;
 
 	// Tries to open the first XEM.
 
-	if (okCUsbFrontPanel::NoError != xem->OpenBySerial()) {
+	if (okCFrontPanel::NoError != xem->OpenBySerial()) {
 		delete xem;
-		xem = (okCUsbFrontPanel*) NULL;
+		xem = (okCFrontPanel*) NULL;
 		printf ("Initialization Failed: A XEM board was not detected\n");
 		return NULL;
 	}
 
-	if (okCUsbFrontPanel::brdXEM3010 != xem->GetBoardModel()) {
+	if (okCFrontPanel::brdXEM3010 != xem->GetBoardModel()) {
 		delete xem;
-		xem = (okCUsbFrontPanel*) NULL;
+		xem = (okCFrontPanel*) NULL;
 		printf ("Initialization Failed: The XEM board detected was not of type \"XEM3010\"\n");
 		return NULL;
 	}
@@ -65,7 +65,7 @@ okCUsbFrontPanel* initialize_xem (const std::string filename)
 	// Pointer to the Phased Locked Loop (pll) container object.
 	pll = new okCPLL22393;
 
-	// set to 100 mhz, 40 mhz
+	// set to 101 mhz, 40 mhz
 	// Setting the VCO (Voltage Controlled Oscillator) to 384MHzk
 	pll->SetPLLParameters (0,400,48,TRUE);
 	pll->SetOutputDivider (0,4); // Set Divider1 to 6.
@@ -76,9 +76,9 @@ okCUsbFrontPanel* initialize_xem (const std::string filename)
 	pll->SetOutputSource (1,okCPLL22393::ClkSrc_PLL0_0);
 	pll->SetOutputEnable (1,TRUE);
 
-	if (okCUsbFrontPanel::NoError != xem->SetPLL22393Configuration (*pll)) {
+	if (okCFrontPanel::NoError != xem->SetPLL22393Configuration (*pll)) {
 		delete xem;
-		xem = (okCUsbFrontPanel*) NULL;
+		xem = (okCFrontPanel*) NULL;
 		delete pll;
 		pll = (okCPLL22393*) NULL;
 		printf ("Initialization Failed: The PLL could not be set.\n");
@@ -86,9 +86,9 @@ okCUsbFrontPanel* initialize_xem (const std::string filename)
 	}
 
 	// Upload the (bitstream) configuration file.
-	if (okCUsbFrontPanel::NoError != xem->ConfigureFPGA (filename)) {
+	if (okCFrontPanel::NoError != xem->ConfigureFPGA (filename)) {
 		delete xem;
-		xem = (okCUsbFrontPanel*) NULL;
+		xem = (okCFrontPanel*) NULL;
 		printf ("Initialization Failed: Could not load the (bitstream) configuration file\n");
 		return NULL;
 	}
@@ -96,7 +96,7 @@ okCUsbFrontPanel* initialize_xem (const std::string filename)
 	return xem;
 }
 
-void reset_device (okCUsbFrontPanel *xem)
+void reset_device (okCFrontPanel *xem)
 {
 
 	// Assert reset
@@ -120,7 +120,7 @@ int main (void)
 
 
 	// Create pointer to the Opal Kelly library on connect to board.
-	okCUsbFrontPanel *xem = initialize_xem (CONFIGURATION_FILE);
+	okCFrontPanel *xem = initialize_xem (CONFIGURATION_FILE);
 
 	if (NULL == xem) {
 		printf ("server: could not initialize connection to opal kelly board.\n");
@@ -295,7 +295,7 @@ int main (void)
 	pll = (okCPLL22393*) NULL;
 
 	delete xem;
-	xem = (okCUsbFrontPanel*) NULL;
+	xem = (okCFrontPanel*) NULL;
 
 	printf ("The End\n");
 

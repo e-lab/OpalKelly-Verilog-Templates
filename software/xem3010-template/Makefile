@@ -12,8 +12,7 @@ VPATH=.:src/
 # VPATH will locate them...
 SOURCE = \
 	xem3010-template.cpp \
-	okFrontPanelDLL.cpp \
-	okFrontPanelDLL.h 
+	okFrontPanelDLL.cpp
 
 
 # Build a Dependency list and an Object list, by replacing the .cpp
@@ -28,7 +27,7 @@ TARGET=xem3010-template
 
 # What compiler to use for generating dependencies: it will be invoked with -MM -MP
 CXXDEP = g++
-CXX = g++-4.0
+CXX = g++-4.2
 
 
 # What include flags to pass to the compiler
