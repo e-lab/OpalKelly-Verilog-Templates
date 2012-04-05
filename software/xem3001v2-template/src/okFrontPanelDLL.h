@@ -6,32 +6,21 @@
 // which references the FrontPanel DLL methods.
 //
 //------------------------------------------------------------------------
-// Copyright (c) 2005-2009 Opal Kelly Incorporated
-// $Rev: 640 $ $Date: 2009-02-26 20:55:49 -0800 (Thu, 26 Feb 2009) $
+// Copyright (c) 2005-2010 Opal Kelly Incorporated
+// $Rev: 991 $ $Date: 2011-08-15 08:57:09 -0700 (Mon, 15 Aug 2011) $
 //------------------------------------------------------------------------
 
 #ifndef __okFrontPanelDLL_h__
 #define __okFrontPanelDLL_h__
-
-#if defined(_WIN32)
-#include <windows.h>
-#elif defined(LINUX)
-#elif defined(MACOSX)
-#endif
 
 // The following ifdef block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the FRONTPANELDLL_EXPORTS
 // symbol defined on the command line.  This symbol should not be defined on any project
 // that uses this DLL.
 #if defined(_WIN32)
-#if defined(FRONTPANELDLL_EXPORTS)
-#define okDLLEXPORT __declspec(dllexport)
-#define DLL_ENTRY   __stdcall
-#else
 #define okDLLEXPORT
 #define DLL_ENTRY   __stdcall
-#endif
-#elif defined(LINUX) || defined(MACOSX)
+#elif defined(__linux__) || defined(__APPLE__)
 #define okDLLEXPORT
 #define DLL_ENTRY
 #endif
@@ -47,8 +36,12 @@ extern "C"
 
 	typedef void* okPLL22150_HANDLE;
 	typedef void* okPLL22393_HANDLE;
-	typedef void* okUSBFRONTPANEL_HANDLE;
+	typedef void* okFrontPanel_HANDLE;
 	typedef int Bool;
+
+#define MAX_SERIALNUMBER_LENGTH      10       // 10 characters + Does NOT include termination NULL.
+#define MAX_DEVICEID_LENGTH          32       // 32 characters + Does NOT include termination NULL.
+#define MAX_BOARDMODELSTRING_LENGTH  64       // 64 characters including termination NULL.
 
 #ifndef TRUE
 #define TRUE    1
@@ -91,7 +84,15 @@ extern "C"
 		ok_brdXEM3050 = 7,
 		ok_brdXEM9002 = 8,
 		ok_brdXEM3001RB = 9,
-		ok_brdXEM5010 = 10
+		ok_brdXEM5010 = 10,
+		ok_brdXEM6110LX45 = 11,
+		ok_brdXEM6110LX150 = 15,
+		ok_brdXEM6001 = 12,
+		ok_brdXEM6010LX45 = 13,
+		ok_brdXEM6010LX150 = 14,
+		ok_brdXEM6006LX9 = 16,
+		ok_brdXEM6006LX16 = 17,
+		ok_brdXEM6006LX25 = 18
 	} ok_BoardModel;
 
 	typedef enum {
@@ -110,14 +111,17 @@ extern "C"
 		ok_I2CBitError                = -12,
 		ok_I2CNack                    = -13,
 		ok_I2CUnknownStatus           = -14,
-		ok_UnsupportedFeature         = -15
+		ok_UnsupportedFeature         = -15,
+		ok_FIFOUnderflow              = -16,
+		ok_FIFOOverflow               = -17,
+		ok_DataAlignmentError         = -18
 	} ok_ErrorCode;
 
 //
 // Define the LoadLib and FreeLib methods for the IMPORT side.
 //
 #ifndef FRONTPANELDLL_EXPORTS
-	Bool okFrontPanelDLL_LoadLib (char *libname);
+	Bool okFrontPanelDLL_LoadLib (const char *libname);
 	void okFrontPanelDLL_FreeLib (void);
 #endif
 
@@ -179,54 +183,55 @@ extern "C"
 
 
 //
-// okUsbFrontPanel
+// okFrontPanel
 //
-	okDLLEXPORT okUSBFRONTPANEL_HANDLE DLL_ENTRY okUsbFrontPanel_Construct();
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_Destruct (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_WriteI2C (okUSBFRONTPANEL_HANDLE hnd, const int addr, int length, unsigned char *data);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_ReadI2C (okUSBFRONTPANEL_HANDLE hnd, const int addr, int length, unsigned char *data);
-	okDLLEXPORT Bool DLL_ENTRY okUsbFrontPanel_Has16BitHostInterface (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT Bool DLL_ENTRY okUsbFrontPanel_IsHighSpeed (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT ok_BoardModel DLL_ENTRY okUsbFrontPanel_GetBoardModel (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT int DLL_ENTRY okUsbFrontPanel_GetDeviceCount (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT ok_BoardModel DLL_ENTRY okUsbFrontPanel_GetDeviceListModel (okUSBFRONTPANEL_HANDLE hnd, int num);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_GetDeviceListSerial (okUSBFRONTPANEL_HANDLE hnd, int num, char *buf, int len);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_OpenBySerial (okUSBFRONTPANEL_HANDLE hnd, const char *serial);
-	okDLLEXPORT Bool DLL_ENTRY okUsbFrontPanel_IsOpen (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_EnableAsynchronousTransfers (okUSBFRONTPANEL_HANDLE hnd, Bool enable);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_SetBTPipePollingInterval (okUSBFRONTPANEL_HANDLE hnd, int interval);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_SetTimeout (okUSBFRONTPANEL_HANDLE hnd, int timeout);
-	okDLLEXPORT int DLL_ENTRY okUsbFrontPanel_GetDeviceMajorVersion (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT int DLL_ENTRY okUsbFrontPanel_GetDeviceMinorVersion (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_ResetFPGA (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_GetSerialNumber (okUSBFRONTPANEL_HANDLE hnd, char *buf);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_GetDeviceID (okUSBFRONTPANEL_HANDLE hnd, char *buf);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_SetDeviceID (okUSBFRONTPANEL_HANDLE hnd, const char *strID);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_ConfigureFPGA (okUSBFRONTPANEL_HANDLE hnd, const char *strFilename);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_ConfigureFPGAFromMemory (okUSBFRONTPANEL_HANDLE hnd, unsigned char *data, unsigned long length);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_GetPLL22150Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22150_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_SetPLL22150Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22150_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_GetEepromPLL22150Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22150_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_SetEepromPLL22150Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22150_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_GetPLL22393Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22393_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_SetPLL22393Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22393_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_GetEepromPLL22393Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22393_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_SetEepromPLL22393Configuration (okUSBFRONTPANEL_HANDLE hnd, okPLL22393_HANDLE pll);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_LoadDefaultPLLConfiguration (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT Bool DLL_ENTRY okUsbFrontPanel_IsFrontPanelEnabled (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT Bool DLL_ENTRY okUsbFrontPanel_IsFrontPanel3Supported (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_UpdateWireIns (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_SetWireInValue (okUSBFRONTPANEL_HANDLE hnd, int ep, int val, int mask);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_UpdateWireOuts (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT int DLL_ENTRY okUsbFrontPanel_GetWireOutValue (okUSBFRONTPANEL_HANDLE hnd, int epAddr);
-	okDLLEXPORT ok_ErrorCode DLL_ENTRY okUsbFrontPanel_ActivateTriggerIn (okUSBFRONTPANEL_HANDLE hnd, int epAddr, int bit);
-	okDLLEXPORT void DLL_ENTRY okUsbFrontPanel_UpdateTriggerOuts (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT Bool DLL_ENTRY okUsbFrontPanel_IsTriggered (okUSBFRONTPANEL_HANDLE hnd, int epAddr, int mask);
-	okDLLEXPORT long DLL_ENTRY okUsbFrontPanel_GetLastTransferLength (okUSBFRONTPANEL_HANDLE hnd);
-	okDLLEXPORT long DLL_ENTRY okUsbFrontPanel_WriteToPipeIn (okUSBFRONTPANEL_HANDLE hnd, int epAddr, long length, unsigned char *data);
-	okDLLEXPORT long DLL_ENTRY okUsbFrontPanel_ReadFromPipeOut (okUSBFRONTPANEL_HANDLE hnd, int epAddr, long length, unsigned char *data);
-	okDLLEXPORT long DLL_ENTRY okUsbFrontPanel_WriteToBlockPipeIn (okUSBFRONTPANEL_HANDLE hnd, int epAddr, int blockSize, long length, unsigned char *data);
-	okDLLEXPORT long DLL_ENTRY okUsbFrontPanel_ReadFromBlockPipeOut (okUSBFRONTPANEL_HANDLE hnd, int epAddr, int blockSize, long length, unsigned char *data);
+	okDLLEXPORT okFrontPanel_HANDLE DLL_ENTRY okFrontPanel_Construct();
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_Destruct (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_WriteI2C (okFrontPanel_HANDLE hnd, const int addr, int length, unsigned char *data);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_ReadI2C (okFrontPanel_HANDLE hnd, const int addr, int length, unsigned char *data);
+	okDLLEXPORT int DLL_ENTRY okFrontPanel_GetHostInterfaceWidth (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT Bool DLL_ENTRY okFrontPanel_IsHighSpeed (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT ok_BoardModel DLL_ENTRY okFrontPanel_GetBoardModel (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_GetBoardModelString (okFrontPanel_HANDLE hnd, ok_BoardModel m, char *buf);
+	okDLLEXPORT int DLL_ENTRY okFrontPanel_GetDeviceCount (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT ok_BoardModel DLL_ENTRY okFrontPanel_GetDeviceListModel (okFrontPanel_HANDLE hnd, int num);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_GetDeviceListSerial (okFrontPanel_HANDLE hnd, int num, char *buf);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_OpenBySerial (okFrontPanel_HANDLE hnd, const char *serial);
+	okDLLEXPORT Bool DLL_ENTRY okFrontPanel_IsOpen (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_EnableAsynchronousTransfers (okFrontPanel_HANDLE hnd, Bool enable);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_SetBTPipePollingInterval (okFrontPanel_HANDLE hnd, int interval);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_SetTimeout (okFrontPanel_HANDLE hnd, int timeout);
+	okDLLEXPORT int DLL_ENTRY okFrontPanel_GetDeviceMajorVersion (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT int DLL_ENTRY okFrontPanel_GetDeviceMinorVersion (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_ResetFPGA (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_GetSerialNumber (okFrontPanel_HANDLE hnd, char *buf);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_GetDeviceID (okFrontPanel_HANDLE hnd, char *buf);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_SetDeviceID (okFrontPanel_HANDLE hnd, const char *strID);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_ConfigureFPGA (okFrontPanel_HANDLE hnd, const char *strFilename);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_ConfigureFPGAFromMemory (okFrontPanel_HANDLE hnd, unsigned char *data, unsigned long length);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_GetPLL22150Configuration (okFrontPanel_HANDLE hnd, okPLL22150_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_SetPLL22150Configuration (okFrontPanel_HANDLE hnd, okPLL22150_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_GetEepromPLL22150Configuration (okFrontPanel_HANDLE hnd, okPLL22150_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_SetEepromPLL22150Configuration (okFrontPanel_HANDLE hnd, okPLL22150_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_GetPLL22393Configuration (okFrontPanel_HANDLE hnd, okPLL22393_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_SetPLL22393Configuration (okFrontPanel_HANDLE hnd, okPLL22393_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_GetEepromPLL22393Configuration (okFrontPanel_HANDLE hnd, okPLL22393_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_SetEepromPLL22393Configuration (okFrontPanel_HANDLE hnd, okPLL22393_HANDLE pll);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_LoadDefaultPLLConfiguration (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT Bool DLL_ENTRY okFrontPanel_IsFrontPanelEnabled (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT Bool DLL_ENTRY okFrontPanel_IsFrontPanel3Supported (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_UpdateWireIns (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_SetWireInValue (okFrontPanel_HANDLE hnd, int ep, unsigned long val, unsigned long mask);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_UpdateWireOuts (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT unsigned long DLL_ENTRY okFrontPanel_GetWireOutValue (okFrontPanel_HANDLE hnd, int epAddr);
+	okDLLEXPORT ok_ErrorCode DLL_ENTRY okFrontPanel_ActivateTriggerIn (okFrontPanel_HANDLE hnd, int epAddr, int bit);
+	okDLLEXPORT void DLL_ENTRY okFrontPanel_UpdateTriggerOuts (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT Bool DLL_ENTRY okFrontPanel_IsTriggered (okFrontPanel_HANDLE hnd, int epAddr, unsigned long mask);
+	okDLLEXPORT long DLL_ENTRY okFrontPanel_GetLastTransferLength (okFrontPanel_HANDLE hnd);
+	okDLLEXPORT long DLL_ENTRY okFrontPanel_WriteToPipeIn (okFrontPanel_HANDLE hnd, int epAddr, long length, unsigned char *data);
+	okDLLEXPORT long DLL_ENTRY okFrontPanel_ReadFromPipeOut (okFrontPanel_HANDLE hnd, int epAddr, long length, unsigned char *data);
+	okDLLEXPORT long DLL_ENTRY okFrontPanel_WriteToBlockPipeIn (okFrontPanel_HANDLE hnd, int epAddr, int blockSize, long length, unsigned char *data);
+	okDLLEXPORT long DLL_ENTRY okFrontPanel_ReadFromBlockPipeOut (okFrontPanel_HANDLE hnd, int epAddr, int blockSize, long length, unsigned char *data);
 
 
 #ifdef __cplusplus
@@ -234,7 +239,6 @@ extern "C"
 //------------------------------------------------------------------------
 // okCPLL22150 C++ wrapper class
 //------------------------------------------------------------------------
-
 	class okCPLL22150
 	{
 	public:
@@ -283,7 +287,6 @@ extern "C"
 //------------------------------------------------------------------------
 // okCPLL22150 C++ wrapper class
 //------------------------------------------------------------------------
-
 	class okCPLL22393
 	{
 	public:
@@ -325,11 +328,10 @@ extern "C"
 //------------------------------------------------------------------------
 // okCFrontPanel C++ wrapper class
 //------------------------------------------------------------------------
-
-	class okCUsbFrontPanel
+	class okCFrontPanel
 	{
 	public:
-		okUSBFRONTPANEL_HANDLE h;
+		okFrontPanel_HANDLE h;
 		enum BoardModel {
 			brdUnknown=0,
 			brdXEM3001v1=1,
@@ -341,7 +343,15 @@ extern "C"
 			brdXEM3050=7,
 			brdXEM9002=8,
 			brdXEM3001RB=9,
-			brdXEM5010=10
+			brdXEM5010=10,
+			brdXEM6110LX45=11,
+			brdXEM6110LX150=15,
+			brdXEM6001=12,
+			brdXEM6010LX45=13,
+			brdXEM6010LX150=14,
+			brdXEM6006LX9=16,
+			brdXEM6006LX16=17,
+			brdXEM6006LX25=18
 		};
 		enum ErrorCode {
 			NoError                    = 0,
@@ -365,10 +375,11 @@ extern "C"
 		bool to_bool (Bool x);
 		Bool from_bool (bool x);
 	public:
-		okCUsbFrontPanel();
-		~okCUsbFrontPanel();
-		bool Has16BitHostInterface();
+		okCFrontPanel();
+		~okCFrontPanel();
+		int GetHostInterfaceWidth();
 		BoardModel GetBoardModel();
+		std::string GetBoardModelString (BoardModel m);
 		int GetDeviceCount();
 		BoardModel GetDeviceListModel (int num);
 		std::string GetDeviceListSerial (int num);
@@ -402,23 +413,21 @@ extern "C"
 		bool IsFrontPanelEnabled();
 		bool IsFrontPanel3Supported();
 		void UpdateWireIns();
-		ErrorCode SetWireInValue (int ep, int val, int mask = 0xffff);
+		ErrorCode SetWireInValue (int ep, unsigned long val, unsigned long mask = 0xffffffff);
 		void UpdateWireOuts();
-		int GetWireOutValue (int epAddr);
+		unsigned long GetWireOutValue (int epAddr);
 		ErrorCode ActivateTriggerIn (int epAddr, int bit);
 		void UpdateTriggerOuts();
-		bool IsTriggered (int epAddr, int mask);
+		bool IsTriggered (int epAddr, unsigned long mask);
 		long GetLastTransferLength();
 		long WriteToPipeIn (int epAddr, long length, unsigned char *data);
 		long ReadFromPipeOut (int epAddr, long length, unsigned char *data);
 		long WriteToBlockPipeIn (int epAddr, int blockSize, long length, unsigned char *data);
 		long ReadFromBlockPipeOut (int epAddr, int blockSize, long length, unsigned char *data);
 	};
-
 #endif // !defined(FRONTPANELDLL_EXPORTS)
 
 }
-
 #endif // __cplusplus
 
 #endif // __okFrontPanelDLL_h__

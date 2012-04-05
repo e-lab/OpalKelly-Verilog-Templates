@@ -28,7 +28,7 @@ TARGET=xem3001v2_template
 
 # What compiler to use for generating dependencies: it will be invoked with -MM -MP
 CXXDEP = g++
-CXX = g++-4.0
+CXX = g++-4.2
 
 
 # What include flags to pass to the compiler
